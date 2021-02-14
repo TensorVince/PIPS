@@ -5,11 +5,30 @@ class PIPS:
     def __init__(self, dbPath = "./pipdb.sqlite"):
         self.DBPATH = dbPath
 
-    def PrintTableFromResult(result):
-        # iterate over the results to print them
-        rows = cur.fetchall()
+    def PrintTableFromResult(self, headers, rows):
+
+        # iterate over the results to determine col-lengths
+        maxLengths = [0] * len(headers)
         for row in rows:
-            print()
+            for col in range(0, len(headers)):
+                colLen = len(row[col])
+                maxLengths[col] = colLen if colLen > maxLengths[col] else maxLengths[col]
+
+        # Create Table colFormatStrings
+        colFormatStrings = []
+        for maxLength in maxLengths:
+            colFormatStrings.append("{:<" + str(maxLength) + "}")
+
+        # print headers
+        for i in range(0, len(colFormatStrings)):
+            print(colFormatStrings[i].format(headers[i]), end = " | ")
+        print("")
+        
+        # iterate over the results to print them
+        for row in rows:
+            for i in range(len(row)):
+                print(colFormatStrings[i].format(), end=" | ")
+            print("")
 
     def SELECT(self, searchValue, *fields):
         con = None
